@@ -1,4 +1,4 @@
-luage
+LuaGE
 =====
 
 LUA Gamma Engine
