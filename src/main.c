@@ -23,6 +23,18 @@ void getGameInfos(ge_LuaScript* script, int* exit, char* currPage)
 	}
 }
 
+bool fileexists(char* file)
+{
+	geDebugCritical(false);
+	ge_File* fp_test = geFileOpen(file, GE_FILE_MODE_READ);
+	geDebugCritical(true);
+	if(fp_test){
+		geFileClose(fp_test);
+		return true;
+	}
+	return false;
+}
+
 int main(int ac, char** av)
 {
 	if(ac > 1 && !strcmp(av[1], "--debug")){
@@ -30,6 +42,7 @@ int main(int ac, char** av)
 	}
 	geInit();
 
+	geSplashscreenEnable(false);
 #ifdef PLATFORM_android
 	geCreateMainWindow("", -1, -1, 0);
 	geCursorVisible(false);
@@ -59,10 +72,20 @@ int main(int ac, char** av)
 	}
 	gePrintDebug(0x100, "locale : %s\n", locale);
 
+
+	char locale_lua[64] = "";
+	sprintf(locale_lua, "languages/%s.lua", locale);
+	if(!fileexists(locale_lua)){
+		strcpy(locale, "en");
+	}
+	sprintf(locale_lua, "languages/%s.lua", locale);
+
 	ge_LuaScript* script = geLoadLuaScript("index.lua");
 	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
 
-	geLuaCallFunction(script, "screen.setLocale", "s", locale);
+	if(fileexists(locale_lua)){
+		geLuaCallFunction(script, "screen.setLocale", "s", locale);
+	}
 	geLuaCallFunction(script, "screen.init", "i, i", geGetContext()->width, geGetContext()->height);
 	geLuaCallFunction(script, "sfx.init", "");
 	geLuaCallFunction(script, "setup", "");
@@ -91,11 +114,11 @@ int main(int ac, char** av)
 		}else{
 			bool input = false;
 			if(geKeysToggled(keys, GEK_LBUTTON)){
-				geLuaCallFunction(script, "screen.page:click", "d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0);
+				geLuaCallFunction(script, "screen.page:click", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
 				input = true;
 			}
 			if(keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
-				geLuaCallFunction(script, "screen.page:touch", "d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0);
+				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
 				input = true;
 			}
 			if(input){
