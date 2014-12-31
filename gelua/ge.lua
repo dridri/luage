@@ -252,9 +252,9 @@ function collide(x1, y1, x2, y2, dist)
 end
 
 
-dofile("gelua/ui.Button.lua")
-dofile("gelua/ui.InputText.lua")
-
-dofile("gelua/Page.lua")
-dofile("gelua/BigMenu.lua")
-dofile("gelua/Menu.lua")
+-- dofile("gelua/ui.Button.lua")
+-- dofile("gelua/ui.InputText.lua")
+-- 
+-- dofile("gelua/Page.lua")
+-- dofile("gelua/BigMenu.lua")
+-- dofile("gelua/Menu.lua")
