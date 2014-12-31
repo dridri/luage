@@ -1,5 +1,7 @@
 #include <locale.h>
 #include <libge/libge.h>
+#include <lua5.2/lauxlib.h>
+#include "gelua.h"
 
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
 
@@ -60,6 +62,7 @@ int main(int ac, char** av)
 	gePrintDebug(0x100, "locale : %s\n", locale);
 
 	ge_LuaScript* script = geLoadLuaScript("index.lua");
+	geLuaDoString(script, gelua);
 	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
 
 	geLuaCallFunction(script, "screen.setLocale", "s", locale);
