@@ -1,13 +1,11 @@
 -- This is a sample file
 -- All coordinates are in range [0.0 - 1.0], no pixels involved
 
-dofile("gelua/ge.lua")
-
 MyPage = inheritsFrom(Page)
 myPage = MyPage:create()
 
 setup = function()
-	screen.setFont(FONT_SIZE_NORMAL, "C:/Windows/Fonts/Arial.ttf", 1.0)
+	screen.setFont(FONT_SIZE_NORMAL, "data/arial.ttf", 1.0)
 	screen.page = myPage
 	screen.spage = "myPage"
 end
@@ -15,6 +13,10 @@ end
 -- Called once
 function MyPage:setup()
 	self.plot_radius = 0.01
+	self.test = geImage.create(32, 32, geColor.New(255, 255, 255))
+	self.test.x = 0.5
+	self.test.y = 0.5
+	self.test.angle = 0.0
 end
 
 -- Called each time this page is displayed
@@ -41,6 +43,7 @@ function MyPage:update(t, dt)
 		plot.x = plot.x + math.cos((t - plot.t) * 10.0) * self.plot_radius / screen.hratio
 		plot.y = plot.y + math.sin((t - plot.t) * 10.0) * self.plot_radius / screen.vratio
 	end
+	self.test.angle = self.test.angle + dt
 end
 
 -- Called everyframe
@@ -48,5 +51,6 @@ function MyPage:draw()
 	for i, plot in pairs(self.plots) do
 		screen.print(plot.x, plot.y, plot.text)
 	end
+	screen.draw(self.test)
+	screen.print(0, 0, "FPS : " .. geFps())
 end
-

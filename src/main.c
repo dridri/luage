@@ -1,11 +1,35 @@
 #include <locale.h>
 #include <libge/libge.h>
 #include <lua5.2/lauxlib.h>
-#include "gelua.h"
+
+#define DECL_RC_BLOB(n) \
+	extern char _binary_##n##_lua_start; \
+	extern char _binary_##n##_lua_end;
+
+#define RC_BLOB_START(n) &_binary_##n##_lua_start
+	
+#define RC_BLOB_END(n) &_binary_##n##_lua_end
 
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
 
 ge_Font* font = 0;
+
+DECL_RC_BLOB(ge);
+DECL_RC_BLOB(ui_Button);
+DECL_RC_BLOB(ui_InputText);
+DECL_RC_BLOB(Page);
+DECL_RC_BLOB(BigMenu);
+DECL_RC_BLOB(Menu);
+
+char* mkrcstring(char* start, char* end){
+	static char* str = 0;
+	if(str == 0){
+		str = (char*)geMalloc(16384);
+	}
+	memcpy(str, start, end - start);
+	str[end - start] = 0;
+	return str;
+}
 
 void getGameInfos(ge_LuaScript* script, int* exit, char* currPage)
 {
@@ -83,7 +107,14 @@ int main(int ac, char** av)
 	sprintf(locale_lua, "languages/%s.lua", locale);
 
 	ge_LuaScript* script = geLoadLuaScript("index.lua");
-	geLuaDoString(script, gelua);
+
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(ge), RC_BLOB_END(ge)));
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(ui_Button), RC_BLOB_END(ui_Button)));
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(ui_InputText), RC_BLOB_END(ui_InputText)));
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(Page), RC_BLOB_END(Page)));
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(BigMenu), RC_BLOB_END(BigMenu)));
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(Menu), RC_BLOB_END(Menu)));
+
 	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
 
 	if(fileexists(locale_lua)){
