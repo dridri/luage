@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 
 project(LuaGE)
 
-if(WIN32)
-	set(CMAKE_C_COMPILER C:/MinGW/mingw64/bin/x86_64-w64-mingw32-gcc.exe) ## TODO
-	set(CMAKE_CXX_COMPILER C:/MinGW/mingw64/bin/x86_64-w64-mingw32-g++.exe) ## TODO
-endif()
-
 add_executable(txt2c txt2c/main.c)
 
 add_custom_target(

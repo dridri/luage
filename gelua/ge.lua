@@ -71,8 +71,10 @@ screen.init = function(w, h)
 	screen.size = math.min(screen.width, screen.height)
 	screen.hratio = screen.width / screen.size
 	screen.vratio = screen.height / screen.size
-	screen.shader = geShader:getDefaultShader()
 	screen.defaultShader = geShader:getDefaultShader()
+	if screen.shader == nil then
+		screen.shader = geShader:getDefaultShader()
+	end
 end
 
 screen.setDefaultShader = function(vert, frag)
@@ -133,6 +135,7 @@ screen.print = function(x, y, str)
 		x = 0.5 - w / 2 / screen.width
 	end
 	screen.font[FONT_SIZE_NORMAL]:print(x * screen.width, y * screen.height, str)
+	screen.shader:use()
 end
 
 screen.lprint = function(x, y, str)
