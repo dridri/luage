@@ -49,18 +49,6 @@ void getGameInfos(ge_LuaScript* script, int* exit, char* currPage)
 	}
 }
 
-bool fileexists(char* file)
-{
-	geDebugCritical(false);
-	ge_File* fp_test = geFileOpen(file, GE_FILE_MODE_READ);
-	geDebugCritical(true);
-	if(fp_test){
-		geFileClose(fp_test);
-		return true;
-	}
-	return false;
-}
-
 int main(int ac, char** av)
 {
 	if(ac > 1 && !strcmp(av[1], "--debug")){
@@ -86,6 +74,7 @@ int main(int ac, char** av)
 	char* flocale = setlocale(LC_ALL, NULL);
 	if(flocale){
 		strcpy(locale, flocale);
+		for(char* p=locale; *p; ++p) *p = tolower(*p);
 		if(strchr(locale, '_')){
 			strchr(locale, '_')[0] = 0;
 		}
@@ -101,7 +90,7 @@ int main(int ac, char** av)
 
 	char locale_lua[64] = "";
 	sprintf(locale_lua, "languages/%s.lua", locale);
-	if(!fileexists(locale_lua)){
+	if(!geFileExists(locale_lua)){
 		strcpy(locale, "en");
 	}
 	sprintf(locale_lua, "languages/%s.lua", locale);
@@ -117,7 +106,7 @@ int main(int ac, char** av)
 
 	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
 
-	if(fileexists(locale_lua)){
+	if(geFileExists(locale_lua)){
 		geLuaCallFunction(script, "screen.setLocale", "s", locale);
 	}
 	geLuaCallFunction(script, "screen.init", "i, i", geGetContext()->width, geGetContext()->height);
