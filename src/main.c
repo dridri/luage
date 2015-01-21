@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <ctype.h>
 #include <libge/libge.h>
 #include <lua5.2/lauxlib.h>
 
@@ -14,6 +15,7 @@
 
 ge_Font* font = 0;
 
+DECL_RC_BLOB(c30log);
 DECL_RC_BLOB(ge);
 DECL_RC_BLOB(ui_Button);
 DECL_RC_BLOB(ui_InputText);
@@ -55,18 +57,7 @@ int main(int ac, char** av)
 		geDebugMode(GE_DEBUG_ALL);
 	}
 	geInit();
-
 	geSplashscreenEnable(false);
-#ifdef PLATFORM_android
-	geCreateMainWindow("", -1, -1, 0);
-	geCursorVisible(false);
-#else
-	geCreateMainWindow("GE", 400, 640, GE_WINDOW_RESIZABLE);
-#endif
-
-	geWaitVsync(true);
-	geClearColor(RGBA(0, 0, 0, 255));
-
 	ge_Keys* keys = geCreateKeys();
 
 	char locale[32] = "";
@@ -95,8 +86,29 @@ int main(int ac, char** av)
 	}
 	sprintf(locale_lua, "languages/%s.lua", locale);
 
-	ge_LuaScript* script = geLoadLuaScript("index.lua");
+	ge_LuaScript* script = geLoadLuaScript("config.lua");
 
+	geLuaDoString(script, "MOBILE = 1\n");
+	geLuaDoString(script, "DESKTOP = 2\n");
+	geLuaDoString(script, "screen = {}\n");
+	geLuaDoString(script, "platform = {}\n");
+#if (defined(PLATFORM_android))
+	geLuaDoString(script, "platform.type = MOBILE\n");
+#else
+	geLuaDoString(script, "platform.type = DESKTOP\n");
+#endif
+	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
+
+#ifdef PLATFORM_android
+	geCreateMainWindow("", -1, -1, 0);
+	geCursorVisible(false);
+#else
+	geCreateMainWindow("GE", 400, 640, GE_WINDOW_RESIZABLE);
+#endif
+	geWaitVsync(true);
+	geClearColor(RGBA(0, 0, 0, 255));
+
+	geLuaDoString(script, mkrcstring(RC_BLOB_START(c30log), RC_BLOB_END(c30log)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(ge), RC_BLOB_END(ge)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(ui_Button), RC_BLOB_END(ui_Button)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(ui_InputText), RC_BLOB_END(ui_InputText)));
@@ -104,7 +116,9 @@ int main(int ac, char** av)
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(BigMenu), RC_BLOB_END(BigMenu)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(Menu), RC_BLOB_END(Menu)));
 
-	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
+	gePrintDebug(0, "A \n");
+	geLuaDoFile(script, "index.lua");
+	gePrintDebug(0, "B \n");
 
 	if(geFileExists(locale_lua)){
 		geLuaCallFunction(script, "screen.setLocale", "s", locale);

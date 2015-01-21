@@ -159,20 +159,20 @@ end
 
 
 
-function inheritsFrom( baseClass )
-	new_class = {}
-	new_class_mt = { __index = new_class }
-	setmetatable( new_class, { __index = baseClass } )
-
-	function new_class:create()
-		local new_inst = {}
-		setmetatable( new_inst, new_class_mt )
-		new_inst:constructor()
-		return new_inst
-	end
-
-	return new_class
-end
+-- function inheritsFrom( baseClass )
+-- 	new_class = {}
+-- 	new_class_mt = { __index = new_class }
+-- 	setmetatable( new_class, { __index = baseClass } )
+-- 
+-- 	function new_class:create()
+-- 		local new_inst = {}
+-- 		setmetatable( new_inst, new_class_mt )
+-- 		new_inst:constructor()
+-- 		return new_inst
+-- 	end
+-- 
+-- 	return new_class
+-- end
 
 function deepcopy(o, seen)
 	seen = seen or {}

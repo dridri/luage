@@ -1,12 +1,8 @@
-Button = {}
-Button_mt = { __index = Button }
+Button = class("Button")
 
-function Button:create(str, cb)
-	local new_inst = {}
-	setmetatable( new_inst, Button_mt )
-	new_inst.text = str
-	new_inst.cb = cb
-	return new_inst
+function Button:init(str, cb)
+	self.text = str
+	self.cb = cb
 end
 
 function Button:fullText()

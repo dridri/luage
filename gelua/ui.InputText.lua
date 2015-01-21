@@ -1,13 +1,9 @@
-InputText = {}
-InputText_mt = { __index = InputText }
+InputText = class("InputText")
 
-function InputText:create(str, def, cb)
-	local new_inst = {}
-	setmetatable( new_inst, InputText_mt )
-	new_inst.label = str
-	new_inst.text = def
-	new_inst.cb = cb
-	return new_inst
+function InputText:init(str, def, cb)
+	self.label = str
+	self.text = def
+	self.cb = cb
 end
 
 function InputText:fullText()

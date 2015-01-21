@@ -1,4 +1,4 @@
-Menu = inheritsFrom( Page )
+Menu = Page:extend("Menu")
 
 function Menu:preinit()
 	self.widgets = {}

@@ -35,6 +35,8 @@ elseif("${target}" MATCHES "linux*")
 	endif()
 endif()
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+
 
 if("${ARCH}" MATCHES "64")
 	set(OBJCPY_OUT elf64-x86-64)
@@ -43,6 +45,7 @@ else()
 endif()
 
 set(gelua_obj_files
+	${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
 	${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
 	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
 	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o
@@ -61,6 +64,7 @@ set_source_files_properties(
 add_custom_command(
 			OUTPUT ${gelua_obj_files}
 			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/gelua
+			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 c30log.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
 			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ge.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
 			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.Button.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
 			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.InputText.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o

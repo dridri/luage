@@ -1,4 +1,4 @@
-BigMenu = inheritsFrom( Page )
+BigMenu = Page:extend("BigMenu")
 
 function BigMenu:preinit()
 	self.buttons = {}

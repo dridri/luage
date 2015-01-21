@@ -1,8 +1,8 @@
 -- This is a sample file
 -- All coordinates are in range [0.0 - 1.0], no pixels involved
 
-MyPage = inheritsFrom(Page)
-myPage = MyPage:create()
+MyPage = Page:extend()
+myPage = MyPage:new()
 
 setup = function()
 	screen.setFont(FONT_SIZE_NORMAL, "data/arial.ttf", 1.0)
