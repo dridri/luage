@@ -8,10 +8,13 @@ option(ARCH "ARCH")
 if(${target} MATCHES OFF)
 	if(WIN32)
 		set(target win)
+		add_defitions(-DPLATFORM_win)
 	elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 		set(target mac)
+		add_definitions(-DPLATFORM_mac)
 	elseif(UNIX)
 		set(target linux)
+		add_definitions(-DPLATFORM_linux)
 	endif()
 endif()
 
@@ -38,47 +41,84 @@ endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 
 
-if("${ARCH}" MATCHES "64")
-	set(OBJCPY_OUT elf64-x86-64)
-else()
-	set(OBJCPY_OUT elf32-i386)
-endif()
+#if("${ARCH}" MATCHES "64")
+#	set(OBJCPY_OUT elf64-x86-64)
+#else()
+#	set(OBJCPY_OUT elf32-i386)
+#endif()
 
-set(gelua_obj_files
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_Page.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_BigMenu.o
-	${CMAKE_CURRENT_BINARY_DIR}/gelua_Menu.o
-	)
+#set(gelua_obj_files
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_Page.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_BigMenu.o
+#	${CMAKE_CURRENT_BINARY_DIR}/gelua_Menu.o
+#	)
 
-set_source_files_properties(
-			${gelua_obj_files}
-			PROPERTIES
-			EXTERNAL_OBJECT true
-			GENERATED true
-			)
+#set_source_files_properties(
+#			${gelua_obj_files}
+#			PROPERTIES
+#			EXTERNAL_OBJECT true
+#			GENERATED true
+#			)
 
-add_custom_command(
-			OUTPUT ${gelua_obj_files}
-			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/gelua
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 c30log.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ge.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.Button.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.InputText.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 Page.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_Page.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 BigMenu.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_BigMenu.o
-			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 Menu.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_Menu.o
-			)
+#add_custom_command(
+#			OUTPUT ${gelua_obj_files}
+#			WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/gelua
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 c30log.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_c30log.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ge.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ge.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.Button.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_Button.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 ui.InputText.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_ui_InputText.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 Page.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_Page.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 BigMenu.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_BigMenu.o
+#			COMMAND objcopy -I binary -O ${OBJCPY_OUT} -B i386 Menu.lua ${CMAKE_CURRENT_BINARY_DIR}/gelua_Menu.o
+#			)
+
+
+add_executable(txt2c txt2c/main.c)
+
+add_custom_target(c30log.h COMMAND txt2c h_c30log ${CMAKE_BINARY_DIR}/c30log.h ${CMAKE_SOURCE_DIR}/gelua/c30log.lua)
+add_custom_target(gelua.h COMMAND txt2c h_gelua ${CMAKE_BINARY_DIR}/gelua.h ${CMAKE_SOURCE_DIR}/gelua/ge.lua)
+add_custom_target(ui.Button.h COMMAND txt2c h_uiButton ${CMAKE_BINARY_DIR}/ui.Button.h ${CMAKE_SOURCE_DIR}/gelua/ui.Button.lua)
+add_custom_target(ui.InputText.h COMMAND txt2c h_uiInputText ${CMAKE_BINARY_DIR}/ui.InputText.h ${CMAKE_SOURCE_DIR}/gelua/ui.InputText.lua)
+add_custom_target(Page.h COMMAND txt2c h_Page ${CMAKE_BINARY_DIR}/Page.h ${CMAKE_SOURCE_DIR}/gelua/Page.lua)
+add_custom_target(BigMenu.h COMMAND txt2c h_BigMenu ${CMAKE_BINARY_DIR}/BigMenu.h ${CMAKE_SOURCE_DIR}/gelua/BigMenu.lua)
+add_custom_target(Menu.h COMMAND txt2c h_Menu ${CMAKE_BINARY_DIR}/Menu.h ${CMAKE_SOURCE_DIR}/gelua/Menu.lua)
+
+#add_custom_target(
+#				gelua.h
+#				COMMAND txt2c
+#				gelua
+#				${CMAKE_BINARY_DIR}/gelua.h
+#				${CMAKE_SOURCE_DIR}/gelua/c30log.lua
+#				${CMAKE_SOURCE_DIR}/gelua/ge.lua
+				#${CMAKE_SOURCE_DIR}/gelua/ui.Button.lua
+				#${CMAKE_SOURCE_DIR}/gelua/ui.InputText.lua
+				#${CMAKE_SOURCE_DIR}/gelua/Page.lua
+				#${CMAKE_SOURCE_DIR}/gelua/BigMenu.lua
+				#${CMAKE_SOURCE_DIR}/gelua/Menu.lua
+#)
+
+include_directories(${CMAKE_BINARY_DIR})
+
+
 
 
 set(SOURCES
 	src/main.c
-	${gelua_obj_files}
+#	${gelua_obj_files}
 )
 
 add_executable(luage ${SOURCES})
+
+add_dependencies(luage c30log.h)
+add_dependencies(luage gelua.h)
+add_dependencies(luage ui.Button.h)
+add_dependencies(luage ui.InputText.h)
+add_dependencies(luage Page.h)
+add_dependencies(luage BigMenu.h)
+add_dependencies(luage Menu.h)
 
 target_link_libraries(luage -lge)

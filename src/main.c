@@ -3,6 +3,14 @@
 #include <libge/libge.h>
 #include <lua5.2/lauxlib.h>
 
+#include "c30log.h"
+#include "gelua.h"
+#include "ui.Button.h"
+#include "ui.InputText.h"
+#include "Page.h"
+#include "BigMenu.h"
+#include "Menu.h"
+
 #define DECL_RC_BLOB(n) \
 	extern char _binary_##n##_lua_start; \
 	extern char _binary_##n##_lua_end;
@@ -107,7 +115,7 @@ int main(int ac, char** av)
 #endif
 	geWaitVsync(true);
 	geClearColor(RGBA(0, 0, 0, 255));
-
+/*
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(c30log), RC_BLOB_END(c30log)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(ge), RC_BLOB_END(ge)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(ui_Button), RC_BLOB_END(ui_Button)));
@@ -115,6 +123,9 @@ int main(int ac, char** av)
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(Page), RC_BLOB_END(Page)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(BigMenu), RC_BLOB_END(BigMenu)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(Menu), RC_BLOB_END(Menu)));
+*/
+	printf("h_c30log :\n%s\n", h_c30log);
+	geLuaDoString(script, h_c30log);
 
 	gePrintDebug(0, "A \n");
 	geLuaDoFile(script, "index.lua");
