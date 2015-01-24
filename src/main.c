@@ -100,7 +100,7 @@ int main(int ac, char** av)
 	geLuaDoString(script, "DESKTOP = 2\n");
 	geLuaDoString(script, "screen = {}\n");
 	geLuaDoString(script, "platform = {}\n");
-#if (defined(PLATFORM_android))
+#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
 	geLuaDoString(script, "platform.type = MOBILE\n");
 #else
 	geLuaDoString(script, "platform.type = DESKTOP\n");
@@ -126,6 +126,12 @@ int main(int ac, char** av)
 */
 	printf("h_c30log :\n%s\n", h_c30log);
 	geLuaDoString(script, h_c30log);
+	geLuaDoString(script, h_gelua);
+	geLuaDoString(script, h_uiButton);
+	geLuaDoString(script, h_uiInputText);
+	geLuaDoString(script, h_Page);
+	geLuaDoString(script, h_BigMenu);
+	geLuaDoString(script, h_Menu);
 
 	gePrintDebug(0, "A \n");
 	geLuaDoFile(script, "index.lua");
