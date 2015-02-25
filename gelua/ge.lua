@@ -10,6 +10,15 @@ ORIGIN_TOPLEFT = 0
 ORIGIN_CENTER = 1
 
 
+
+_real_geImage_load = geImage.load
+geImage.load = function(path)
+	img = _real_geImage_load(path)
+	img:TextureMode(GE_LINEAR)
+	return img
+end
+
+
 screen = {}
 sfx = {}
 game = {}
@@ -122,9 +131,9 @@ screen.draw = function(img, align, _x, _y)
 	x = x + (_x or img.x) * screen.width
 	y = y + (_y or img.y) * screen.height
 	if img.angle and img.angle ~= 0 then
-		geImage.blitStretchedRotated(x, y, img:width() * size, img:height() * size, img, img.angle, 0, 0, img:width(), img:height(), flags)
+		geImage.blitStretchedRotated(x, y, img.width * size, img.height * size, img, img.angle, 0, 0, img.width, img.height, flags)
 	else
-		geImage.blitStretched(x, y, img:width() * size, img:height() * size, img, 0, 0, img:width(), img:height(), flags)
+		geImage.blitStretched(x, y, img.width * size, img.height * size, img, 0, 0, img.width, img.height, flags)
 	end
 end
 

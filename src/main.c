@@ -3,13 +3,13 @@
 #include <libge/libge.h>
 #include <lua5.2/lauxlib.h>
 
-#include "c30log.h"
-#include "gelua.h"
-#include "ui.Button.h"
-#include "ui.InputText.h"
-#include "Page.h"
-#include "BigMenu.h"
-#include "Menu.h"
+#include <c30log.h>
+#include <gelua.h>
+#include <ui.Button.h>
+#include <ui.InputText.h>
+#include <Page.h>
+#include <BigMenu.h>
+#include <Menu.h>
 
 #define DECL_RC_BLOB(n) \
 	extern char _binary_##n##_lua_start; \
@@ -64,6 +64,7 @@ int main(int ac, char** av)
 	if(ac > 1 && !strcmp(av[1], "--debug")){
 		geDebugMode(GE_DEBUG_ALL);
 	}
+
 	geInit();
 	geSplashscreenEnable(false);
 	ge_Keys* keys = geCreateKeys();
@@ -107,12 +108,20 @@ int main(int ac, char** av)
 #endif
 	geLuaScriptStart(script, GE_LUA_EXECUTION_MODE_NORMAL);
 
+	geLuaTableOpen(script, "screen", true);
+	bool fs = geLuaTableVariableBooleanByName(script, "fullscreen");
+	bool rz = geLuaTableVariableBooleanByName(script, "resizable");
+	const char* title = geLuaTableVariableStringByName(script, "title");
+	int width = geLuaTableVariableIntegerByName(script, "width");
+	int height = geLuaTableVariableIntegerByName(script, "height");
+	int flags = (fs ? GE_WINDOW_FULLSCREEN : 0) | (rz ? GE_WINDOW_RESIZABLE : 0);
+	geLuaTableClose(script);
+
+	geCreateMainWindow(title, width, height, flags);
 #ifdef PLATFORM_android
-	geCreateMainWindow("", -1, -1, 0);
 	geCursorVisible(false);
-#else
-	geCreateMainWindow("GE", 400, 640, GE_WINDOW_RESIZABLE);
 #endif
+
 	geWaitVsync(true);
 	geClearColor(RGBA(0, 0, 0, 255));
 /*
@@ -124,7 +133,6 @@ int main(int ac, char** av)
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(BigMenu), RC_BLOB_END(BigMenu)));
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(Menu), RC_BLOB_END(Menu)));
 */
-	printf("h_c30log :\n%s\n", h_c30log);
 	geLuaDoString(script, h_c30log);
 	geLuaDoString(script, h_gelua);
 	geLuaDoString(script, h_uiButton);
