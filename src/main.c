@@ -19,7 +19,9 @@
 	
 #define RC_BLOB_END(n) &_binary_##n##_lua_end
 
+#ifndef min
 #define min(a, b) ( ((a) < (b)) ? (a) : (b) )
+#endif
 
 ge_Font* font = 0;
 
