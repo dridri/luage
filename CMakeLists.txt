@@ -77,15 +77,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 #			)
 
 
-add_executable(txt2c txt2c/main.c)
+#add_executable(txt2c txt2c/main.c)
+add_custom_target(txt2c COMMAND gcc -o ${CMAKE_BINARY_DIR}/txt2c ${CMAKE_SOURCE_DIR}/txt2c/main.c)
 
-add_custom_target(c30log.h COMMAND txt2c h_c30log ${CMAKE_BINARY_DIR}/c30log.h ${CMAKE_SOURCE_DIR}/gelua/c30log.lua)
-add_custom_target(gelua.h COMMAND txt2c h_gelua ${CMAKE_BINARY_DIR}/gelua.h ${CMAKE_SOURCE_DIR}/gelua/ge.lua)
-add_custom_target(ui.Button.h COMMAND txt2c h_uiButton ${CMAKE_BINARY_DIR}/ui.Button.h ${CMAKE_SOURCE_DIR}/gelua/ui.Button.lua)
-add_custom_target(ui.InputText.h COMMAND txt2c h_uiInputText ${CMAKE_BINARY_DIR}/ui.InputText.h ${CMAKE_SOURCE_DIR}/gelua/ui.InputText.lua)
-add_custom_target(Page.h COMMAND txt2c h_Page ${CMAKE_BINARY_DIR}/Page.h ${CMAKE_SOURCE_DIR}/gelua/Page.lua)
-add_custom_target(BigMenu.h COMMAND txt2c h_BigMenu ${CMAKE_BINARY_DIR}/BigMenu.h ${CMAKE_SOURCE_DIR}/gelua/BigMenu.lua)
-add_custom_target(Menu.h COMMAND txt2c h_Menu ${CMAKE_BINARY_DIR}/Menu.h ${CMAKE_SOURCE_DIR}/gelua/Menu.lua)
+add_custom_target(c30log.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_c30log ${CMAKE_BINARY_DIR}/c30log.h ${CMAKE_SOURCE_DIR}/gelua/c30log.lua)
+add_custom_target(gelua.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_gelua ${CMAKE_BINARY_DIR}/gelua.h ${CMAKE_SOURCE_DIR}/gelua/ge.lua)
+add_custom_target(ui.Button.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_uiButton ${CMAKE_BINARY_DIR}/ui.Button.h ${CMAKE_SOURCE_DIR}/gelua/ui.Button.lua)
+add_custom_target(ui.InputText.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_uiInputText ${CMAKE_BINARY_DIR}/ui.InputText.h ${CMAKE_SOURCE_DIR}/gelua/ui.InputText.lua)
+add_custom_target(Page.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_Page ${CMAKE_BINARY_DIR}/Page.h ${CMAKE_SOURCE_DIR}/gelua/Page.lua)
+add_custom_target(BigMenu.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_BigMenu ${CMAKE_BINARY_DIR}/BigMenu.h ${CMAKE_SOURCE_DIR}/gelua/BigMenu.lua)
+add_custom_target(Menu.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_Menu ${CMAKE_BINARY_DIR}/Menu.h ${CMAKE_SOURCE_DIR}/gelua/Menu.lua)
 
 #add_custom_target(
 #				gelua.h
@@ -112,6 +113,14 @@ set(SOURCES
 )
 
 add_executable(luage ${SOURCES})
+
+add_dependencies(c30log.h txt2c)
+add_dependencies(gelua.h txt2c)
+add_dependencies(ui.Button.h txt2c)
+add_dependencies(ui.InputText.h txt2c)
+add_dependencies(Page.h txt2c)
+add_dependencies(BigMenu.h txt2c)
+add_dependencies(Menu.h txt2c)
 
 add_dependencies(luage c30log.h)
 add_dependencies(luage gelua.h)
