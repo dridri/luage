@@ -40,8 +40,14 @@ endif()
 
 if("${ARCH}" MATCHES "64")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -m64")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -m64")
+	set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -std=c99 -m64")
+	set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -std=c99 -m64")
 else()
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -m32")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -m32")
+	set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -std=c99 -m32")
+	set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -std=c99 -m32")
 endif()
 
 
