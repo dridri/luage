@@ -5,6 +5,7 @@
 
 #include <c30log.h>
 #include <gelua.h>
+#include <Runnable.h>
 #include <ui.Button.h>
 #include <ui.InputText.h>
 #include <Page.h>
@@ -27,6 +28,7 @@ ge_Font* font = 0;
 
 DECL_RC_BLOB(c30log);
 DECL_RC_BLOB(ge);
+DECL_RC_BLOB(Runnable);
 DECL_RC_BLOB(ui_Button);
 DECL_RC_BLOB(ui_InputText);
 DECL_RC_BLOB(Page);
@@ -66,6 +68,9 @@ int main(int ac, char** av)
 	if(ac > 1 && !strcmp(av[1], "--debug")){
 		geDebugMode(GE_DEBUG_ALL);
 	}
+#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
+		geDebugMode(GE_DEBUG_ALL);
+#endif
 
 	geInit();
 	geSplashscreenEnable(false);
@@ -137,6 +142,7 @@ int main(int ac, char** av)
 */
 	geLuaDoString(script, h_c30log);
 	geLuaDoString(script, h_gelua);
+	geLuaDoString(script, h_Runnable);
 	geLuaDoString(script, h_uiButton);
 	geLuaDoString(script, h_uiInputText);
 	geLuaDoString(script, h_Page);
@@ -155,6 +161,7 @@ int main(int ac, char** av)
 	geLuaCallFunction(script, "setup", "");
 
 	double t = geGetTick() / 1000.0;
+	double dt = 0.0;
 	char currPage[128] = "";
 	int quit = 0;
 	int w = geGetContext()->width;
@@ -190,8 +197,7 @@ int main(int ac, char** av)
 			}
 
 			geLuaCallFunction(script, "screen.update", "d", geGetTick() / 1000.0);
-			geLuaCallFunction(script, "screen.page:update", "d, d", geGetTick() / 1000.0, geGetTick() / 1000.0 - t);
-			t = geGetTick() / 1000.0;
+			geLuaCallFunction(script, "screen.page:update", "d, d", geGetTick() / 1000.0, dt);
 			getGameInfos(script, &quit, currPage);
 
 			geLuaCallFunction(script, "screen.page:run", "");
@@ -199,6 +205,8 @@ int main(int ac, char** av)
 		}
 
 		geSwapBuffers();
+		dt = (geGetTick() / 1000.0) - t;
+		t = geGetTick() / 1000.0;
 	}
 
 #ifdef PLATFORM_android

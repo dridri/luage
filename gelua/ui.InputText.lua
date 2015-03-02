@@ -13,11 +13,11 @@ end
 function InputText:render(font)
 	local text = self.label .. " : " .. self.text
 	if font ~= nil then
-		w, h = font:measureString(text)
+		local w, h = font:measureString(text)
 		screen.defaultShader:use()
 		font:print(self.textx * screen.width, self.texty * screen.height, text)
 	else
-		w, h = screen.font[FONT_SIZE_NORMAL]:measureString(text)
+		local w, h = screen.font[FONT_SIZE_NORMAL]:measureString(text)
 		screen.defaultShader:use()
 		screen.font[FONT_SIZE_NORMAL]:print(self.textx * screen.width, self.texty * screen.height, text)
 	end

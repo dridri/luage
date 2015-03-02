@@ -10,13 +10,14 @@ function Button:fullText()
 end
 
 function Button:render(font)
+	local f = math.floor
 	if font ~= nil then
-		w, h = font:measureString(self.text)
+		local w, h = font:measureString(self.text)
 		screen.defaultShader:use()
-		font:print(self.textx * screen.width, self.texty * screen.height, self.text)
+		font:print(f(self.textx * screen.width), f(self.texty * screen.height), self.text)
 	else
-		w, h = screen.font[FONT_SIZE_NORMAL]:measureString(self.text)
+		local w, h = screen.font[FONT_SIZE_NORMAL]:measureString(self.text)
 		screen.defaultShader:use()
-		screen.font[FONT_SIZE_NORMAL]:print(self.textx * screen.width, self.texty * screen.height, self.text)
+		screen.font[FONT_SIZE_NORMAL]:print(f(self.textx * screen.width), f(self.texty * screen.height), self.text)
 	end
 end

@@ -36,9 +36,9 @@ local function instantiate(self,...)
   setmetatable(instance,self)
   
   if self.init then
-    if type(self.init) == 'table' then 
+    if type(self.init) == 'table' then
       deep_copy(self.init, instance)
-    else 
+    else
       self.init(instance, ...) 
     end
   end

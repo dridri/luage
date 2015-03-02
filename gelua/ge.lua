@@ -13,7 +13,7 @@ ORIGIN_CENTER = 1
 
 _real_geImage_load = geImage.load
 geImage.load = function(path)
-	img = _real_geImage_load(path)
+	local img = _real_geImage_load(path)
 	img:TextureMode(GE_LINEAR)
 	return img
 end
@@ -92,7 +92,7 @@ end
 
 screen.setFont = function(sz, file, factor)
 	screen.font[sz] = geFont.load(file)
-	pixels = screen.size / 20
+	local pixels = screen.size / 20
 	if sz == FONT_SIZE_SMALL then
 		pixels = pixels * 0.75
 	elseif sz == FONT_SIZE_LARGE then
@@ -103,10 +103,10 @@ end
 
 screen.draw = function(img, align, _x, _y)
 	screen.shader:use()
-	x = 0
-	y = 0
-	flags = 0
-	size = 1.0
+	local x = 0
+	local y = 0
+	local flags = 0
+	local size = 1.0
 	if img.origin == ORIGIN_CENTER then
 		flags = GE_BLIT_CENTERED
 	end
@@ -130,20 +130,22 @@ screen.draw = function(img, align, _x, _y)
 	size = size * img.scale
 	x = x + (_x or img.x) * screen.width
 	y = y + (_y or img.y) * screen.height
+	local f = math.floor
 	if img.angle and img.angle ~= 0 then
-		geImage.blitStretchedRotated(x, y, img.width * size, img.height * size, img, img.angle, 0, 0, img.width, img.height, flags)
+		geImage.blitStretchedRotated(f(x), f(y), f(img.width * size), f(img.height * size), img, img.angle, 0, 0, img.width, img.height, flags)
 	else
-		geImage.blitStretched(x, y, img.width * size, img.height * size, img, 0, 0, img.width, img.height, flags)
+		geImage.blitStretched(f(x), f(y), f(img.width * size), f(img.height * size), img, 0, 0, img.width, img.height, flags)
 	end
 end
 
 screen.print = function(x, y, str)
+	local f = math.floor
 	screen.defaultShader:use()
 	if x == CENTER then
 		w, h = screen.font[FONT_SIZE_NORMAL]:measureString(str)
 		x = 0.5 - w / 2 / screen.width
 	end
-	screen.font[FONT_SIZE_NORMAL]:print(x * screen.width, y * screen.height, str)
+	screen.font[FONT_SIZE_NORMAL]:print(f(x * screen.width), f(y * screen.height), str)
 	screen.shader:use()
 end
 
@@ -168,20 +170,26 @@ end
 
 
 
--- function inheritsFrom( baseClass )
--- 	new_class = {}
--- 	new_class_mt = { __index = new_class }
--- 	setmetatable( new_class, { __index = baseClass } )
--- 
--- 	function new_class:create()
--- 		local new_inst = {}
--- 		setmetatable( new_inst, new_class_mt )
--- 		new_inst:constructor()
--- 		return new_inst
--- 	end
--- 
--- 	return new_class
--- end
+
+local _G_metatable = getmetatable(_G) or {}
+
+_G_metatable.__newindex = function(table, key, value)
+	print("_G_metatable.__newindex(table, " .. key .. ", value)")
+	rawset(table, key, value)
+end
+
+_G_metatable.__index = function(table, key)
+	print("_G_metatable.__index(table, " .. key .. ")")
+	if string.find(key, ".", 1, true) then
+		local sub = string.sub(key, 1, string.find(key, ".", 1, true) - 1)
+		return _G_metatable.__index(rawget(table, sub), string.sub(key, string.find(key, ".", 1, true) + 1, -1))
+	end
+	return rawget(table, key)
+end
+
+setmetatable(_G, _G_metatable)
+
+
 
 function deepcopy(o, seen)
 	seen = seen or {}
@@ -259,7 +267,7 @@ function normalize2(v)
 end
 
 function collide(x1, y1, x2, y2, dist)
-	d = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+	local d = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
 	return d <= dist
 end
 

@@ -10,7 +10,7 @@ function Menu:gotfocus()
 	local bigger = { 0, 0 }
 
 	for k,v in pairs(self.widgets) do
-		w, h = screen.font[FONT_SIZE_NORMAL]:measureString(v:fullText())
+		local w, h = screen.font[FONT_SIZE_NORMAL]:measureString(v:fullText())
 		v.y = y / screen.height
 		bigger[1] = math.max(bigger[1], w)
 		bigger[2] = math.max(bigger[2], h)

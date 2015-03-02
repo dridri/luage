@@ -9,7 +9,7 @@ function BigMenu:preinit()
 	local bigger = { 0, 0 }
 
 	for k,v in pairs(self.buttons) do
-		w, h = self.font:measureString(v.text)
+		local w, h = self.font:measureString(v.text)
 		v.y = y / screen.height
 		bigger[1] = math.max(bigger[1], w)
 		bigger[2] = math.max(bigger[2], h)
