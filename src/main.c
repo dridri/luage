@@ -1,7 +1,6 @@
 #include <locale.h>
 #include <ctype.h>
 #include <libge/libge.h>
-#include <lua5.2/lauxlib.h>
 
 #include <c30log.h>
 #include <gelua.h>
@@ -130,6 +129,7 @@ int main(int ac, char** av)
 #endif
 
 	geWaitVsync(true);
+// 	geWaitVsync(false);
 	geClearColor(RGBA(0, 0, 0, 255));
 /*
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(c30log), RC_BLOB_END(c30log)));
