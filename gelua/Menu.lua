@@ -3,6 +3,7 @@ Menu = Page:extend("Menu")
 function Menu:preinit()
 	self.widgets = {}
 	self:setup()
+	self.focused = nil
 end
 
 function Menu:gotfocus()
@@ -25,6 +26,9 @@ function Menu:gotfocus()
 		v.x = x
 		v.w = bigger[1] / screen.width
 		v.h = bigger[2] / screen.height
+		if v.setup then
+			v:setup()
+		end
 	end
 end
 
@@ -32,6 +36,14 @@ function Menu:click(x, y, force)
 	local i = 0
 	for k,v in pairs(self.widgets) do
 		if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
+			if self.focused then
+				self.focused.focused = false
+			end
+			self.focused = v
+			v.focused = true
+			if v.click then
+				v:click(x, y)
+			end
 			v.cb()
 			break
 		end

@@ -7,6 +7,7 @@
 #include <Runnable.h>
 #include <ui.Button.h>
 #include <ui.InputText.h>
+#include <ui.SpinBox.h>
 #include <Page.h>
 #include <BigMenu.h>
 #include <Menu.h>
@@ -64,12 +65,19 @@ void getGameInfos(ge_LuaScript* script, int* exit, char* currPage)
 
 int main(int ac, char** av)
 {
+	char* index = "index.lua";
 	if(ac > 1 && !strcmp(av[1], "--debug")){
 		geDebugMode(GE_DEBUG_ALL);
+		if(ac > 2){
+			index = av[2];
+		}
 	}
-#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
-		geDebugMode(GE_DEBUG_ALL);
-#endif
+	if(ac > 1 && strcmp(av[1], "--debug")){
+		index = av[1];
+	}
+//#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
+//		geDebugMode(GE_DEBUG_ALL);
+//#endif
 
 	geInit();
 	geSplashscreenEnable(false);
@@ -145,12 +153,13 @@ int main(int ac, char** av)
 	geLuaDoString(script, h_Runnable);
 	geLuaDoString(script, h_uiButton);
 	geLuaDoString(script, h_uiInputText);
+	geLuaDoString(script, h_uiSpinBox);
 	geLuaDoString(script, h_Page);
 	geLuaDoString(script, h_BigMenu);
 	geLuaDoString(script, h_Menu);
 
 	gePrintDebug(0, "A \n");
-	geLuaDoFile(script, "index.lua");
+	geLuaDoFile(script, index);
 	gePrintDebug(0, "B \n");
 
 	if(geFileExists(locale_lua)){
@@ -175,6 +184,7 @@ int main(int ac, char** av)
 			w = geGetContext()->width;
 			h = geGetContext()->height;
 			geLuaCallFunction(script, "screen.init", "i, i", w, h);
+			geLuaCallFunction(script, "screen.page:baseinit", "");
 		}
 
 		geReadKeys(keys);

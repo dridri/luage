@@ -4,6 +4,7 @@ function InputText:init(str, def, cb)
 	self.label = str
 	self.text = def
 	self.cb = cb
+	self.visible = true
 end
 
 function InputText:fullText()

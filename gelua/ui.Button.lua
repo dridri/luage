@@ -3,6 +3,7 @@ Button = class("Button")
 function Button:init(str, cb)
 	self.text = str
 	self.cb = cb
+	self.visible = true
 end
 
 function Button:fullText()
