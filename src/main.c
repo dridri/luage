@@ -75,9 +75,9 @@ int main(int ac, char** av)
 	if(ac > 1 && strcmp(av[1], "--debug")){
 		index = av[1];
 	}
-//#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
-//		geDebugMode(GE_DEBUG_ALL);
-//#endif
+#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
+		geDebugMode(GE_DEBUG_ALL);
+#endif
 
 	geInit();
 	geSplashscreenEnable(false);
@@ -165,10 +165,11 @@ int main(int ac, char** av)
 	if(geFileExists(locale_lua)){
 		geLuaCallFunction(script, "screen.setLocale", "s", locale);
 	}
-	geLuaCallFunction(script, "screen.init", "i, i", geGetContext()->width, geGetContext()->height);
+	geLuaCallFunction(script, "screen.init", "d, d", (float)geGetContext()->width, (float)geGetContext()->height);
 	geLuaCallFunction(script, "sfx.init", "");
 	geLuaCallFunction(script, "setup", "");
 
+	u32 fps_ticks = 0;
 	double t = geGetTick() / 1000.0;
 	double dt = 0.0;
 	char currPage[128] = "";
@@ -202,6 +203,10 @@ int main(int ac, char** av)
 				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
 				input = true;
 			}
+			if(!keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
+				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 0.0, geGetTick() / 1000.0);
+				input = true;
+			}
 			if(input){
 				getGameInfos(script, &quit, currPage);
 			}
@@ -214,6 +219,11 @@ int main(int ac, char** av)
 			getGameInfos(script, &quit, currPage);
 		}
 
+#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
+		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
+#else
+		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
+#endif
 		geSwapBuffers();
 		dt = (geGetTick() / 1000.0) - t;
 		t = geGetTick() / 1000.0;
