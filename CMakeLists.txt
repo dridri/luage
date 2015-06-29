@@ -69,7 +69,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 
 
-set(SOURCES src/main.c)
+set(SOURCES src/main.c src/perlin.c)
 
 add_executable(luage ${SOURCES})
 

@@ -1,6 +1,7 @@
 #include <locale.h>
 #include <ctype.h>
 #include <libge/libge.h>
+#include <lua5.2/lua.h>
 
 #include <c30log.h>
 #include <gelua.h>
@@ -34,6 +35,33 @@ DECL_RC_BLOB(ui_InputText);
 DECL_RC_BLOB(Page);
 DECL_RC_BLOB(BigMenu);
 DECL_RC_BLOB(Menu);
+
+static int perlin_seed = 42;
+void perlin_init2(int seed);
+float perlin_noise_2D(float vec[2], int terms, float freq, int seed);
+float perlin_noise_3D(float vec[3], int terms, float freq, int seed);
+
+int lua_perlin_noise_Init(ge_LuaScript* script, void* udata){
+	perlin_init2( geLuaArgumentInteger(script, 1) );
+	return 1;
+}
+
+int lua_perlin_noise_2D(ge_LuaScript* script, void* udata){
+	float vec[2];
+	vec[0] = geLuaArgumentNumber(script, 1);
+	vec[1] = geLuaArgumentNumber(script, 2);
+	int terms = geLuaArgumentInteger(script, 3);
+	float freq = geLuaArgumentNumber(script, 4);
+// 	printf("perlin_noise_2D( { %.2f, %.2f }, %d, %.2f, %d )\n", vec[0], vec[1], terms, freq);
+	float ret = perlin_noise_2D(vec, terms, freq, perlin_seed);
+// 	printf("  ret = %.2f\n", ret);
+	lua_pushnumber(script->L, (double)ret);
+	return 1;
+}
+
+int lua_perlin_noise_3D(ge_LuaScript* script, void* udata){
+	return 1;
+}
 
 char* mkrcstring(char* start, char* end){
 	static char* str = 0;
@@ -110,6 +138,9 @@ int main(int ac, char** av)
 	sprintf(locale_lua, "languages/%s.lua", locale);
 
 	ge_LuaScript* script = geLoadLuaScript("config.lua");
+
+	geLuaAddFunction(script, lua_perlin_noise_2D, "perlin2D", NULL);
+	geLuaAddFunction(script, lua_perlin_noise_Init, "perlinInit", NULL);
 
 	geLuaDoString(script, "MOBILE = 1\n");
 	geLuaDoString(script, "DESKTOP = 2\n");
@@ -195,7 +226,7 @@ int main(int ac, char** av)
 			break;
 		}else{
 			bool input = false;
-			if(geKeysToggled(keys, GEK_LBUTTON)){
+			if(geKeysUnToggled(keys, GEK_LBUTTON)){
 				geLuaCallFunction(script, "screen.page:click", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
 				input = true;
 			}
