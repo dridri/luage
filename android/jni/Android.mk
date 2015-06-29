@@ -23,7 +23,7 @@ endif
 # 	cp -R ../default_shaders assets
 # 	cp -R ../shaders assets
 
-LOCAL_SRC_FILES = ../../src/main.c
+LOCAL_SRC_FILES = ../../src/main.c ../../src/perlin.c
 
 LOCAL_LDFLAGS := -fPIC
 LOCAL_CFLAGS := -std=gnu99 -fPIC -DPLATFORM_android -I../build

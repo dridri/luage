@@ -3,6 +3,8 @@ Button = class("Button")
 function Button:init(str, cb)
 	self.text = str
 	self.cb = cb
+	self.visible = true
+	self.focused = false
 end
 
 function Button:fullText()
@@ -11,13 +13,12 @@ end
 
 function Button:render(font)
 	local f = math.floor
-	if font ~= nil then
-		local w, h = font:measureString(self.text)
-		screen.defaultShader:use()
-		font:print(f(self.textx * screen.width), f(self.texty * screen.height), self.text)
-	else
-		local w, h = screen.font[FONT_SIZE_NORMAL]:measureString(self.text)
-		screen.defaultShader:use()
-		screen.font[FONT_SIZE_NORMAL]:print(f(self.textx * screen.width), f(self.texty * screen.height), self.text)
+	local fnt = font or screen.font[FONT_SIZE_NORMAL]
+	local color = fnt.color
+	local w, h = fnt:measureString(self.text)
+	if self.focused then
+		color = self.focus_color or color
 	end
+	screen.defaultShader:use()
+	fnt:print(f(self.textx * screen.width), f(self.texty * screen.height), self.text, color)
 end

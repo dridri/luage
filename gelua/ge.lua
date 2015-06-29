@@ -99,6 +99,7 @@ screen.setFont = function(sz, file, factor)
 		pixels = pixels * 1.25
 	end
 	screen.font[sz].size = pixels * factor
+	screen.print(0, 0, "") -- Update internal size
 end
 
 screen.draw = function(img, align, _x, _y)

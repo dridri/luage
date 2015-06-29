@@ -1,13 +1,14 @@
 #include <locale.h>
 #include <ctype.h>
 #include <libge/libge.h>
-#include <lua5.2/lauxlib.h>
+#include <lua5.2/lua.h>
 
 #include <c30log.h>
 #include <gelua.h>
 #include <Runnable.h>
 #include <ui.Button.h>
 #include <ui.InputText.h>
+#include <ui.SpinBox.h>
 #include <Page.h>
 #include <BigMenu.h>
 #include <Menu.h>
@@ -34,6 +35,33 @@ DECL_RC_BLOB(ui_InputText);
 DECL_RC_BLOB(Page);
 DECL_RC_BLOB(BigMenu);
 DECL_RC_BLOB(Menu);
+
+static int perlin_seed = 42;
+void perlin_init2(int seed);
+float perlin_noise_2D(float vec[2], int terms, float freq, int seed);
+float perlin_noise_3D(float vec[3], int terms, float freq, int seed);
+
+int lua_perlin_noise_Init(ge_LuaScript* script, void* udata){
+	perlin_init2( geLuaArgumentInteger(script, 1) );
+	return 1;
+}
+
+int lua_perlin_noise_2D(ge_LuaScript* script, void* udata){
+	float vec[2];
+	vec[0] = geLuaArgumentNumber(script, 1);
+	vec[1] = geLuaArgumentNumber(script, 2);
+	int terms = geLuaArgumentInteger(script, 3);
+	float freq = geLuaArgumentNumber(script, 4);
+// 	printf("perlin_noise_2D( { %.2f, %.2f }, %d, %.2f, %d )\n", vec[0], vec[1], terms, freq);
+	float ret = perlin_noise_2D(vec, terms, freq, perlin_seed);
+// 	printf("  ret = %.2f\n", ret);
+	lua_pushnumber(script->L, (double)ret);
+	return 1;
+}
+
+int lua_perlin_noise_3D(ge_LuaScript* script, void* udata){
+	return 1;
+}
 
 char* mkrcstring(char* start, char* end){
 	static char* str = 0;
@@ -65,8 +93,15 @@ void getGameInfos(ge_LuaScript* script, int* exit, char* currPage)
 
 int main(int ac, char** av)
 {
+	char* index = "index.lua";
 	if(ac > 1 && !strcmp(av[1], "--debug")){
 		geDebugMode(GE_DEBUG_ALL);
+		if(ac > 2){
+			index = av[2];
+		}
+	}
+	if(ac > 1 && strcmp(av[1], "--debug")){
+		index = av[1];
 	}
 #if (defined(PLATFORM_android) || defined(PLATFORM_ios))
 		geDebugMode(GE_DEBUG_ALL);
@@ -104,6 +139,9 @@ int main(int ac, char** av)
 
 	ge_LuaScript* script = geLoadLuaScript("config.lua");
 
+	geLuaAddFunction(script, lua_perlin_noise_2D, "perlin2D", NULL);
+	geLuaAddFunction(script, lua_perlin_noise_Init, "perlinInit", NULL);
+
 	geLuaDoString(script, "MOBILE = 1\n");
 	geLuaDoString(script, "DESKTOP = 2\n");
 	geLuaDoString(script, "screen = {}\n");
@@ -130,6 +168,7 @@ int main(int ac, char** av)
 #endif
 
 	geWaitVsync(true);
+// 	geWaitVsync(false);
 	geClearColor(RGBA(0, 0, 0, 255));
 /*
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(c30log), RC_BLOB_END(c30log)));
@@ -145,21 +184,23 @@ int main(int ac, char** av)
 	geLuaDoString(script, h_Runnable);
 	geLuaDoString(script, h_uiButton);
 	geLuaDoString(script, h_uiInputText);
+	geLuaDoString(script, h_uiSpinBox);
 	geLuaDoString(script, h_Page);
 	geLuaDoString(script, h_BigMenu);
 	geLuaDoString(script, h_Menu);
 
 	gePrintDebug(0, "A \n");
-	geLuaDoFile(script, "index.lua");
+	geLuaDoFile(script, index);
 	gePrintDebug(0, "B \n");
 
 	if(geFileExists(locale_lua)){
 		geLuaCallFunction(script, "screen.setLocale", "s", locale);
 	}
-	geLuaCallFunction(script, "screen.init", "i, i", geGetContext()->width, geGetContext()->height);
+	geLuaCallFunction(script, "screen.init", "d, d", (float)geGetContext()->width, (float)geGetContext()->height);
 	geLuaCallFunction(script, "sfx.init", "");
 	geLuaCallFunction(script, "setup", "");
 
+	u32 fps_ticks = 0;
 	double t = geGetTick() / 1000.0;
 	double dt = 0.0;
 	char currPage[128] = "";
@@ -175,6 +216,7 @@ int main(int ac, char** av)
 			w = geGetContext()->width;
 			h = geGetContext()->height;
 			geLuaCallFunction(script, "screen.init", "i, i", w, h);
+			geLuaCallFunction(script, "screen.page:baseinit", "");
 		}
 
 		geReadKeys(keys);
@@ -184,12 +226,16 @@ int main(int ac, char** av)
 			break;
 		}else{
 			bool input = false;
-			if(geKeysToggled(keys, GEK_LBUTTON)){
+			if(geKeysUnToggled(keys, GEK_LBUTTON)){
 				geLuaCallFunction(script, "screen.page:click", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
 				input = true;
 			}
 			if(keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
 				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
+				input = true;
+			}
+			if(!keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
+				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 0.0, geGetTick() / 1000.0);
 				input = true;
 			}
 			if(input){
@@ -204,6 +250,11 @@ int main(int ac, char** av)
 			getGameInfos(script, &quit, currPage);
 		}
 
+#if (defined(PLATFORM_android) || defined(PLATFORM_ios))
+		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
+#else
+		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
+#endif
 		geSwapBuffers();
 		dt = (geGetTick() / 1000.0) - t;
 		t = geGetTick() / 1000.0;
