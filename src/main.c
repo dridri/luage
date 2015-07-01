@@ -11,7 +11,7 @@
 #include <ui.SpinBox.h>
 #include <Page.h>
 #include <BigMenu.h>
-#include <Menu.h>
+#include <geMenu.h>
 
 #define DECL_RC_BLOB(n) \
 	extern char _binary_##n##_lua_start; \
@@ -187,7 +187,7 @@ int main(int ac, char** av)
 	geLuaDoString(script, h_uiSpinBox);
 	geLuaDoString(script, h_Page);
 	geLuaDoString(script, h_BigMenu);
-	geLuaDoString(script, h_Menu);
+	geLuaDoString(script, h_geMenu);
 
 	gePrintDebug(0, "A \n");
 	geLuaDoFile(script, index);
@@ -227,23 +227,23 @@ int main(int ac, char** av)
 		}else{
 			bool input = false;
 			if(geKeysUnToggled(keys, GEK_LBUTTON)){
-				geLuaCallFunction(script, "screen.page:click", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
+				geLuaCallFunction(script, "screen.page:click", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTickFloat());
 				input = true;
 			}
 			if(keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
-				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTick() / 1000.0);
+				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 1.0, geGetTickFloat());
 				input = true;
 			}
 			if(!keys->pressed[GEK_LBUTTON] && keys->last[GEK_LBUTTON]){
-				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 0.0, geGetTick() / 1000.0);
+				geLuaCallFunction(script, "screen.page:touch", "d, d, d, d", geGetContext()->mouse_x / (float)geGetContext()->width, geGetContext()->mouse_y / (float)geGetContext()->height, 0.0, geGetTickFloat());
 				input = true;
 			}
 			if(input){
 				getGameInfos(script, &quit, currPage);
 			}
 
-			geLuaCallFunction(script, "screen.update", "d", geGetTick() / 1000.0);
-			geLuaCallFunction(script, "screen.page:update", "d, d", geGetTick() / 1000.0, dt);
+			geLuaCallFunction(script, "screen.update", "d", geGetTickFloat());
+			geLuaCallFunction(script, "screen.page:update", "d, d", geGetTickFloat(), dt);
 			getGameInfos(script, &quit, currPage);
 
 			geLuaCallFunction(script, "screen.page:run", "");
@@ -256,8 +256,8 @@ int main(int ac, char** av)
 		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
 #endif
 		geSwapBuffers();
-		dt = (geGetTick() / 1000.0) - t;
-		t = geGetTick() / 1000.0;
+		dt = geGetTickFloat() - t;
+		t = geGetTickFloat();
 	}
 
 #ifdef PLATFORM_android

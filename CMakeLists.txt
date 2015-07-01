@@ -70,7 +70,7 @@ add_custom_target(ui.InputText.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_uiInputText
 add_custom_target(ui.SpinBox.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_uiSpinBox ${CMAKE_BINARY_DIR}/ui.SpinBox.h ${CMAKE_SOURCE_DIR}/gelua/ui.SpinBox.lua)
 add_custom_target(Page.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_Page ${CMAKE_BINARY_DIR}/Page.h ${CMAKE_SOURCE_DIR}/gelua/Page.lua)
 add_custom_target(BigMenu.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_BigMenu ${CMAKE_BINARY_DIR}/BigMenu.h ${CMAKE_SOURCE_DIR}/gelua/BigMenu.lua)
-add_custom_target(Menu.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_geMenu ${CMAKE_BINARY_DIR}/Menu2.h ${CMAKE_SOURCE_DIR}/gelua/Menu.lua)
+add_custom_target(Menu.h COMMAND ${CMAKE_BINARY_DIR}/txt2c h_geMenu ${CMAKE_BINARY_DIR}/geMenu.h ${CMAKE_SOURCE_DIR}/gelua/Menu.lua)
 
 include_directories(${CMAKE_BINARY_DIR})
 
