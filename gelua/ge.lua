@@ -98,7 +98,7 @@ screen.setFont = function(sz, file, factor)
 	elseif sz == FONT_SIZE_LARGE then
 		pixels = pixels * 1.25
 	end
-	screen.font[sz].size = pixels * factor
+	screen.font[sz].size = math.floor( pixels * factor )
 	screen.print(0, 0, "") -- Update internal size
 end
 
@@ -218,7 +218,12 @@ end
 function serialize(v)
 	if type(v) == "nil" or type(v) == "userdata" or type(v) == "lightuserdata" then
 		return "nil"
-	elseif type(v) == "number" or type(v) == "integer" or type(v) == "boolean" then
+	elseif type(v) == "boolean" then
+		if v then
+			return "true"
+		end
+		return "false"
+	elseif type(v) == "number" or type(v) == "integer" then
 		return "" .. v
 	elseif type(v) == "string" then
 		return string.format("%q", v)
@@ -228,7 +233,7 @@ function serialize(v)
 end
 
 table.save = function(fp, name, t)
-	fp:write(name .. " = " .. "{}")
+	fp:write(name .. " = " .. "{}\n")
 	for k, v in pairs(t) do
 		local sk = ""
 		if type(k) == "integer" then
@@ -241,7 +246,7 @@ table.save = function(fp, name, t)
 		if type(v) == "table" then
 			table.save(fp, name .. "[" .. sk .. "]", v)
 		else
-			fp:write(name .. "[" .. sk .. "] = ")
+			fp:write(name .. "[" .. sk .. "] = " .. serialize(v) .. "\n")
 		end
 	end
 end
