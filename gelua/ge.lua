@@ -215,40 +215,86 @@ end
 
 
 
-function serialize(v)
-	if type(v) == "nil" or type(v) == "userdata" or type(v) == "lightuserdata" then
-		return "nil"
-	elseif type(v) == "boolean" then
-		if v then
-			return "true"
-		end
-		return "false"
-	elseif type(v) == "number" or type(v) == "integer" then
-		return "" .. v
-	elseif type(v) == "string" then
-		return string.format("%q", v)
+function serialize( fp, name, array, keep_functions )
+	if type(fp) == "string" then
+		keep_functions = array or false
+		array = name
+		name = fp
+		fp = nil
 	else
-		return "unknown type " .. type(v)
+		keep_functions = keep_functions or false
 	end
+
+-- 	local tables_refs = {}
+
+	local function _serialize_core( fwrite, name, value, tab, parent )
+		if type(value) == "function" and not keep_functions then
+			return false
+		end
+
+		for i = 1, tab do
+			fwrite( "\t" )
+		end
+
+		fwrite( name .. " = " )
+		if type(value) == "nil" or type(value) == "userdata" or type(value) == "lightuserdata" then
+			fwrite( "nil" )
+		elseif type(value) == "function" then
+			fwrite( "nil --[[ function ]]" )
+		elseif type(value) == "string" then
+			fwrite( "\"" .. value .. "\"" )
+		elseif type(value) == "number" or type(value) == "integer" then
+			local str = "" .. value
+			str = str:gsub( ",", "." )
+			fwrite( str )
+		elseif type(value) == "boolean" then
+			if value then
+				fwrite( "true" )
+			else
+				fwrite( "false" )
+			end
+		elseif type(value) == "table" then
+-- 			if tables_refs[value] ~= nil then
+-- 				fwrite( tables_refs[value] )
+-- 			else
+-- 				tables_refs[value] = parent .. name
+				fwrite( "{\n" )
+				for k, v in pairs(value) do
+					if type(k) ~= "string" or ( k:sub(1, 2) ~= "__" and k ~= "class" ) then
+						if _serialize_core( fwrite, k, v, tab + 1, name .. "." ) then
+							fwrite( ",\n" )
+						end
+					end
+				end
+				for i = 1, tab do
+					fwrite( "\t" )
+				end
+				fwrite( "}" )
+-- 			end
+		else
+			fwrite( "nil --[[ ERROR : unknown value type '" .. type(value) .. "' ]]" )
+		end
+		return true
+	end
+
+	local retstr = ""
+	local fwrite = nil
+
+	if fp then
+		fwrite = function( str ) fp:write( str ) end
+	else
+		fwrite = function( str ) retstr = retstr .. str end
+	end
+
+	_serialize_core( fwrite, name, array, 0, "" )
+
+	fwrite( "\n" )
+
+	return retstr
 end
 
-table.save = function(fp, name, t)
-	fp:write(name .. " = " .. "{}\n")
-	for k, v in pairs(t) do
-		local sk = ""
-		if type(k) == "integer" then
-			sk = "" .. k
-		elseif type(k) == "string" then
-			sk = string.format("%q", k)
-		else
-			sk = "unknown type " .. type(k)
-		end
-		if type(v) == "table" then
-			table.save(fp, name .. "[" .. sk .. "]", v)
-		else
-			fp:write(name .. "[" .. sk .. "] = " .. serialize(v) .. "\n")
-		end
-	end
+table.save = function( fp, name, t )
+	serialize( fp, name, t, false )
 end
 
 
