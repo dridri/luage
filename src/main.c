@@ -4,6 +4,7 @@
 #include <lua5.2/lua.h>
 
 #include <c30log.h>
+#include <md5.h>
 #include <gelua.h>
 #include <Runnable.h>
 #include <ui.Button.h>
@@ -12,6 +13,7 @@
 #include <Page.h>
 #include <BigMenu.h>
 #include <geMenu.h>
+#include <net.Socket.h>
 
 #define DECL_RC_BLOB(n) \
 	extern char _binary_##n##_lua_start; \
@@ -26,7 +28,7 @@
 #endif
 
 ge_Font* font = 0;
-
+/*
 DECL_RC_BLOB(c30log);
 DECL_RC_BLOB(ge);
 DECL_RC_BLOB(Runnable);
@@ -35,7 +37,7 @@ DECL_RC_BLOB(ui_InputText);
 DECL_RC_BLOB(Page);
 DECL_RC_BLOB(BigMenu);
 DECL_RC_BLOB(Menu);
-
+*/
 static int perlin_seed = 42;
 void perlin_init2(int seed);
 float perlin_noise_2D(float vec[2], int terms, float freq, int seed);
@@ -180,6 +182,7 @@ int main(int ac, char** av)
 	geLuaDoString(script, mkrcstring(RC_BLOB_START(Menu), RC_BLOB_END(Menu)));
 */
 	geLuaDoString(script, h_c30log);
+	geLuaDoString(script, h_md5);
 	geLuaDoString(script, h_gelua);
 	geLuaDoString(script, h_Runnable);
 	geLuaDoString(script, h_uiButton);
@@ -188,6 +191,7 @@ int main(int ac, char** av)
 	geLuaDoString(script, h_Page);
 	geLuaDoString(script, h_BigMenu);
 	geLuaDoString(script, h_geMenu);
+	geLuaDoString(script, h_netSocket);
 
 	gePrintDebug(0, "A \n");
 	geLuaDoFile(script, index);

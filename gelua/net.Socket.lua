@@ -1,3 +1,5 @@
+net = net or {}
+
 net.Socket = class("net.Socket")
 
 function net.Socket:init(server, port)
@@ -11,14 +13,28 @@ function net.Socket:init(server, port)
 end
 
 function net.Socket:connect()
-	if self.sock:connect() == 0 then
+	if ret == 0 then
 		self.connected = true
 	end
 end
 
-function net.Socket:send(buf)
-	if buf ~= nil and type(buf) == "table" then
-		self.sock:send(buf, #buf)
+function net.Socket:close()
+	return self.sock:close()
+end
+
+function net.Socket:send( data )
+	local str = ""
+	if data ~= nil then
+		str = serialize( "", data )
+	end
+	return self.sock:send( str )
+end
+
+function net.Socket:rawsend( data )
+	if type(data) == "string" then
+		return self.sock:send( data )
+	else
+		return self.sock:send( data, #data )
 	end
 end
 
