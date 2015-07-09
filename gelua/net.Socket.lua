@@ -13,6 +13,7 @@ function net.Socket:init(server, port)
 end
 
 function net.Socket:connect()
+	local ret = self.sock:connect()
 	if ret == 0 then
 		self.connected = true
 	end
