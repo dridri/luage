@@ -200,7 +200,11 @@ int main(int ac, char** av)
 	if(geFileExists(locale_lua)){
 		geLuaCallFunction(script, "screen.setLocale", "s", locale);
 	}
-	geLuaCallFunction(script, "screen.init", "d, d", (float)geGetContext()->width, (float)geGetContext()->height);
+#if (defined(PLATFORM_ios))
+    geLuaCallFunction(script, "screen.init", "d, d, i", (float)geGetContext()->width, (float)geGetContext()->height, 1);
+#else
+    geLuaCallFunction(script, "screen.init", "d, d, i", (float)geGetContext()->width, (float)geGetContext()->height, 0);
+#endif
 	geLuaCallFunction(script, "sfx.init", "");
 	geLuaCallFunction(script, "setup", "");
 
@@ -219,7 +223,11 @@ int main(int ac, char** av)
 		if(geGetContext()->width != w || geGetContext()->height != h){
 			w = geGetContext()->width;
 			h = geGetContext()->height;
-			geLuaCallFunction(script, "screen.init", "i, i", w, h);
+#if (defined(PLATFORM_ios))
+			geLuaCallFunction(script, "screen.init", "d, d, i", (float)geGetContext()->width, (float)geGetContext()->height, 1);
+#else
+			geLuaCallFunction(script, "screen.init", "d, d, i", (float)geGetContext()->width, (float)geGetContext()->height, 0);
+#endif
 			geLuaCallFunction(script, "screen.page:baseinit", "");
 		}
 
@@ -255,7 +263,7 @@ int main(int ac, char** av)
 		}
 
 #if (defined(PLATFORM_android) || defined(PLATFORM_ios))
-		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
+// 		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
 #else
 		fps_ticks = geWaitTick(1000 / 60, fps_ticks);
 #endif
@@ -264,7 +272,6 @@ int main(int ac, char** av)
 		t = geGetTickFloat();
 	}
 
-#ifdef PLATFORM_android
-	exit(0);
-#endif
+	geQuit();
+	return 0;
 }

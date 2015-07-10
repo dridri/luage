@@ -73,10 +73,17 @@ screen.update = function(t)
 	end
 end
 
-
-screen.init = function(w, h)
+screen.init = function(w, h, lowres)
 	screen.width = w
 	screen.height = h
+	screen.lowres = false
+	if lowres ~= 0 then
+		screen.lowres = true
+	end
+	screen.size_factor = 1
+	if screen.lowres == true then
+		screen.size_factor = 2
+	end
 	screen.size = math.min(screen.width, screen.height)
 	screen.hratio = screen.width / screen.size
 	screen.vratio = screen.height / screen.size
